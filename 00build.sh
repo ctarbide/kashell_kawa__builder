@@ -56,13 +56,16 @@ if [ ! -f "<<source dir>>/.git/config" ]; then
     if [ -d "<<repos (optional local copy)>>" ]; then
         git clone -b "<<branch>>" "<<repos (optional local copy)>>" "<<source dir>>"
     else
-        git clone -b "<<branch>>" "<<repos (official)>>" "<<source dir>>"
+        git clone --depth 1 -b "<<branch>>" "<<repos (official)>>" "<<source dir>>"
     fi
 fi
 @
 
 <<symlink sandbox>>=
 if [ ! -d "<<source dir>>__git-sandbox" ]; then
+    if [ -h "<<source dir>>__git-sandbox" ]; then
+        rm -fv "<<source dir>>__git-sandbox"
+    fi
     ln -s "${thisdir}/.git" "<<source dir>>__git-sandbox"
 fi
 @
