@@ -89,11 +89,11 @@ set -- "$@" -e distdir=/var/dist
 set -- "$@" -v "${thisdir}:${thisdir}:ro"
 set -- "$@" -v "${HOME}/Downloads/coolscripts:/opt/coolscripts:ro"
 set -- "$@" -v "${distdir}:/var/dist:rw"
-docker-cwd.sh --rm -it "$@" \
+docker-cwd.sh --rm "$@" \
     "<<project builder image>>" \
     sh -eux -c '
-	PATH=/opt/coolscripts/bin:${PATH};
-	exec nofake-exec.sh --error -R"build and install" "${thispath}" -- sh -eux
+        PATH=/opt/coolscripts/bin:${PATH};
+        exec nofake-exec.sh --error -R"build and install" "${thispath}" -- sh -eux
     '
 @
 
@@ -104,9 +104,14 @@ if ! docker image inspect '<<builder image>>' >/dev/null 2>&1; then
 fi
 @
 
+<<get absolute path>>=
+perl -MFile::Spec::Functions=rel2abs,canonpath \
+    -le'print canonpath(rel2abs(\$ARGV[0]))' --
+@
+
 <<prog>>=
-thisprog=${1}; shift # the initial script
-thispath=`perl -MFile::Spec::Functions=rel2abs,canonpath -le'print(canonpath(rel2abs(\$ARGV[0])))' -- "${thisprog}"`
+thispath=`<<get absolute path>> "${1}"`; shift  # the initial script
+thisprog=${thispath##*/}
 thisdir=${thispath%/*}
 cd "${thisdir}"
 
@@ -119,7 +124,7 @@ distdir="<<dist dir base>>/${stamp}"
 mkdir -pv "<<main dir>>" "<<build dir>>" "<<source dir>>" "${distdir}<<prefix>>"
 
 # for future reference
-cp -av "${thisprog}" "${distdir}<<prefix>>/${thisprog}.ref"
+cp -av "${thispath}" "${distdir}<<prefix>>/${thisprog}.ref"
 chmod 0444 "${distdir}<<prefix>>/${thisprog}.ref"
 
 <<extract sources>>
@@ -229,8 +234,10 @@ this runs right after docker
 
 <<cleanup>>=
 (
-   cd "<<dist dir base>>"
-   mv "${stamp}/<<project name>>_${stamp}.tar.gz" .
-   rm -rf "${stamp}"
+    cd "<<dist dir base>>"
+    mv "${stamp}/<<project name>>_${stamp}.tar.gz" .
+    rm -f "<<project name>>_latest.tar.gz"
+    ln -s "<<project name>>_${stamp}.tar.gz" "<<project name>>_latest.tar.gz"
+    rm -rf "${stamp}"
 )
 @
