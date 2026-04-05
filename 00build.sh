@@ -119,7 +119,8 @@ distdir="<<dist dir base>>/${stamp}"
 mkdir -pv "<<main dir>>" "<<build dir>>" "<<source dir>>" "${distdir}<<prefix>>"
 
 # for future reference
-cp -av "${thisprog}" "${distdir}<<prefix>>/"
+cp -av "${thisprog}" "${distdir}<<prefix>>/${thisprog}.ref"
+chmod 0444 "${distdir}<<prefix>>/${thisprog}.ref"
 
 <<extract sources>>
 <<symlink sandbox>>
