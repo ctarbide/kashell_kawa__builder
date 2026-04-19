@@ -62,7 +62,7 @@ fi
 @
 
 <<symlink sandbox>>=
-if [ ! -d "<<source dir>>__git-sandbox" ]; then
+if [ -d "${thisdir}/.git" -a ! -d "<<source dir>>__git-sandbox" ]; then
     if [ -h "<<source dir>>__git-sandbox" ]; then
         rm -fv "<<source dir>>__git-sandbox"
     fi
