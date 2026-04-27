@@ -23,12 +23,18 @@ echo
 
 ****************
 
-'can_be_added_to_path' is at [1].
-
-- [1]: https://github.com/ctarbide/coolscripts/blob/master/README.txt
-
 <<create profile>>=
 cat@<<'EOF'>"<<prefix>>/profile"
+if [ x"`command -v is_path_element`" != x"is_path_element" ]; then
+    is_path_element(){
+        perl -e'do { exit(0) if $_ eq $ARGV[0] } for split(q{:}, $ENV{PATH}); exit(1)' -- "$@"
+    }
+fi
+if [ x"`command -v can_be_added_to_path`" != x"can_be_added_to_path" ]; then
+    can_be_added_to_path(){
+        test -d "${1}" && ! is_path_element "${1}"
+    }
+fi
 if can_be_added_to_path "<<prefix>>/bin"; then
     PATH="<<prefix>>/bin:${PATH}"
 fi
