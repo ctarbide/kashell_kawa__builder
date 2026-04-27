@@ -39,7 +39,7 @@ ${thisdir}/dist
 @
 
 for void-musl-builder:latest look at
-https://github.com/ctarbide/docker-voidlinux
+https://gist.github.com/ctarbide/fc2f271b6d57a87be378727ff0d0ffb9
 
 <<builder image SKIP>>=
 void-musl-builder:latest
